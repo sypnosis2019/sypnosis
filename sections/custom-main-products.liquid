@@ -1,0 +1,94 @@
+{% capture "form_classes" -%}
+  product-form product-form-{{ section.id }}
+  
+  {%- if current_variant.available == false %} product-form--variant-sold-out {%- endif -%}
+{%- endcapture %}
+
+{% form 'product', product, class:form_classes, novalidate: 'novalidate', data-product-form: '' %}
+  {{ form | payment_terms }}
+
+ 
+
+  {% unless product.has_only_default_variant %}
+    
+      {% for option in product.options_with_values %}
+
+        <div class="weight">
+          <p>{{ option.name }}:</p>
+          <div class="d-flex flex-wrap mb-40 single_option_selector option_{{ forloop.index }}">
+              {% for value in option.values %}
+                <a href="javascript:void(0)" class="kg_variant variant_swatch {% if forloop.first %}active{% endif %}" data-value="{{ value | escape }}">{{ value }}</a>
+              {% endfor %}
+          </div>
+        </div>
+
+      {% endfor %}
+    
+  {% endunless %}
+
+  <select name="id" id="ProductSelect-{{ section.id }}" class="product-form__variants no-js select_pys">
+    {% for variant in product.variants %}
+      <option value="{{ variant.id }}" data-price="{{ variant.price | money }}" data-available="{{ variant.available }}"
+        {%- if variant == current_variant %} selected="selected" {%- endif -%} data-title="{{ variant.title | escape }}"
+      >
+        {{ variant.title }}  {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
+      </option>
+    {% endfor %}
+  </select>
+
+
+  {% unless current_variant.available %}disabled="disabled"{% endunless %}>          
+            {% unless current_variant.available %}
+             
+              {% else %}
+               {% if current_variant.inventory_quantity < 1 %}
+                 {% if product.metafields.custom.date_of_arrival %}<div class="date-of-arrival"><label>Date Of Arrival: </label> {{ product.metafields.custom.date_of_arrival }}</div> {% endif %}
+               <div class="product_info_stock prdpage">
+      <span><i class="fas fa-check-circle" aria-hidden="true"></i>          
+             Pre Order
+      </span>
+                  
+    </div>
+               {% endif %}       
+              {% endunless %}
+
+ 
+           
+
+            
+  
+  <div class="d-md-flex">
+      <div class=" d-flex justify-content-between quantity">
+          <span class=" decrement-btn bg-transparent border-0">-</span>
+          <input type="number" class="qty-input qty_pys border-0" id="Quantity-{{ section.id }}" value="1" min="1" pattern="[0-9]*">
+          <span class=" increment-btn bg-transparent border-0 ">+</span>
+      </div>
+      <div class="addtocart">
+          <a href="javascript:void(0);" class="add_to_cart_pys" variant-id="{{ product.selected_or_first_available_variant.id }}"
+            availabilty="{% if current_variant.available %}true{% else %}false{% endif %}"
+           
+            {% unless current_variant.available %}disabled="disabled"{% endunless %}>
+            <span>
+            {% unless current_variant.available %}
+              {{ 'products.product.sold_out' | t }}
+              {% else %}
+               {% if current_variant.inventory_quantity < 1 %}
+                   Pre Order
+               {% else %}
+                    Add To Cart
+               {% endif %}       
+              {% endunless %}
+            </span>
+            
+
+            
+            <svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clip-path="url(#clip0_170_6677)">
+              <path d="M1.1875 1.875C1.00516 1.875 0.830295 1.94743 0.701364 2.07636C0.572433 2.2053 0.5 2.38016 0.5 2.5625C0.5 2.74484 0.572433 2.9197 0.701364 3.04864C0.830295 3.17757 1.00516 3.25 1.1875 3.25H2.71375L3.26512 5.45963L5.32487 16.439C5.35437 16.5965 5.43798 16.7388 5.56125 16.8413C5.68453 16.9437 5.83972 16.9999 6 17H7.375C6.64565 17 5.94618 17.2897 5.43046 17.8055C4.91473 18.3212 4.625 19.0207 4.625 19.75C4.625 20.4793 4.91473 21.1788 5.43046 21.6945C5.94618 22.2103 6.64565 22.5 7.375 22.5C8.10435 22.5 8.80382 22.2103 9.31954 21.6945C9.83527 21.1788 10.125 20.4793 10.125 19.75C10.125 19.0207 9.83527 18.3212 9.31954 17.8055C8.80382 17.2897 8.10435 17 7.375 17H17C16.2707 17 15.5712 17.2897 15.0555 17.8055C14.5397 18.3212 14.25 19.0207 14.25 19.75C14.25 20.4793 14.5397 21.1788 15.0555 21.6945C15.5712 22.2103 16.2707 22.5 17 22.5C17.7293 22.5 18.4288 22.2103 18.9445 21.6945C19.4603 21.1788 19.75 20.4793 19.75 19.75C19.75 19.0207 19.4603 18.3212 18.9445 17.8055C18.4288 17.2897 17.7293 17 17 17H18.375C18.5353 16.9999 18.6905 16.9437 18.8137 16.8413C18.937 16.7388 19.0206 16.5965 19.0501 16.439L21.1126 5.439C21.1312 5.33978 21.1277 5.23768 21.1024 5.13996C21.077 5.04224 21.0305 4.95131 20.966 4.87361C20.9016 4.7959 20.8208 4.73335 20.7295 4.69038C20.6381 4.64742 20.5384 4.62509 20.4375 4.625H4.47375L3.91687 2.39612C3.87976 2.24733 3.79397 2.11521 3.67313 2.02078C3.55229 1.92636 3.40336 1.87504 3.25 1.875H1.1875ZM8.75 19.75C8.75 20.1147 8.60513 20.4644 8.34727 20.7223C8.08941 20.9801 7.73967 21.125 7.375 21.125C7.01033 21.125 6.66059 20.9801 6.40273 20.7223C6.14487 20.4644 6 20.1147 6 19.75C6 19.3853 6.14487 19.0356 6.40273 18.7777C6.66059 18.5199 7.01033 18.375 7.375 18.375C7.73967 18.375 8.08941 18.5199 8.34727 18.7777C8.60513 19.0356 8.75 19.3853 8.75 19.75ZM18.375 19.75C18.375 20.1147 18.2301 20.4644 17.9723 20.7223C17.7144 20.9801 17.3647 21.125 17 21.125C16.6353 21.125 16.2856 20.9801 16.0277 20.7223C15.7699 20.4644 15.625 20.1147 15.625 19.75C15.625 19.3853 15.7699 19.0356 16.0277 18.7777C16.2856 18.5199 16.6353 18.375 17 18.375C17.3647 18.375 17.7144 18.5199 17.9723 18.7777C18.2301 19.0356 18.375 19.3853 18.375 19.75ZM12.875 8.0625V10.125H14.9375C15.1198 10.125 15.2947 10.1974 15.4236 10.3264C15.5526 10.4553 15.625 10.6302 15.625 10.8125C15.625 10.9948 15.5526 11.1697 15.4236 11.2986C15.2947 11.4276 15.1198 11.5 14.9375 11.5H12.875V13.5625C12.875 13.7448 12.8026 13.9197 12.6736 14.0486C12.5447 14.1776 12.3698 14.25 12.1875 14.25C12.0052 14.25 11.8303 14.1776 11.7014 14.0486C11.5724 13.9197 11.5 13.7448 11.5 13.5625V11.5H9.4375C9.25516 11.5 9.0803 11.4276 8.95136 11.2986C8.82243 11.1697 8.75 10.9948 8.75 10.8125C8.75 10.6302 8.82243 10.4553 8.95136 10.3264C9.0803 10.1974 9.25516 10.125 9.4375 10.125H11.5V8.0625C11.5 7.88016 11.5724 7.7053 11.7014 7.57636C11.8303 7.44743 12.0052 7.375 12.1875 7.375C12.3698 7.375 12.5447 7.44743 12.6736 7.57636C12.8026 7.7053 12.875 7.88016 12.875 8.0625Z" fill="#212121"/>
+              </g><defs><clipPath id="clip0_170_6677"><rect width="22" height="22" fill="white" transform="translate(0.5 0.5)"/></clipPath></defs>
+            </svg>
+          </a>
+      </div>
+  </div>
+
+{% endform %}
